@@ -9,6 +9,7 @@ include = [
   "README.md",
   "LICENSE",
   "pyproject.toml",
+  "pilea/input/**/*"
   ]
 
 exclude = ["tests/**/*"]
@@ -41,15 +42,13 @@ markdown = "*"
 pyyaml = "*"
 pygments = "*"
 pymdown-extensions = "*"
-
-# Dev Dependencies
 livereload = "^2.6.1"
+
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 pytest-mock = "^1.11"
 pytest-cov = "^2.8"
 flake8 = "^3.7"
-#TODO unpin once it's more stable
 black = {version = "19.3b0", allows-prereleases = true}
 isort = {version = "^4.3", extras = ["pyproject"]}
 bandit = "^1.6.2"
@@ -67,6 +66,5 @@ default_section = "THIRDPARTY"
 known_first_party = ["pilea", "tests"]
 
 [build-system]
-#TODO unpin once it's more stable
-requires = ["poetry==1.0.0b3"]
+requires = ["poetry>=1.0.0b5"]
 build-backend = "poetry.masonry.api"

@@ -1,0 +1,31 @@
+{% extends "default.html" %}
+{% block content %}
+<div class="row content">
+    <div class="full-width">
+        <!-- <p><img alt="Photo of me" src="/static/img/avatar.jpg"></p> -->
+        
+        <p>Hey! Welcome to pilea.</p>
+        
+        </div>
+</div>
+<div class="row content">
+    <div class="full-width column">
+        <h2>Posts</h2>
+        <ul class="post-list">
+            {% for post in state.posts[:5] %}
+            <li class="post-list-item">
+                <a class="post-list-item-title" href="{{post.url}}">
+                    {{post.title}}
+                </a>    
+                <time class="post-date f-sm f-mono" datetime="2019-06-12T13:51:47-05:00">
+                        {{ post.date }}
+                    </time>
+                
+            </li>
+            
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

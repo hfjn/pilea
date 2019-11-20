@@ -1,0 +1,6 @@
+host_name: localhost:8080
+title: pilea
+subtitle: Yet another blog!
+url: http://localhost
+language: en-us
+birthday: "2019-11-20"
