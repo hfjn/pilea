@@ -35,6 +35,10 @@ class Post:
         return post_id if post_id else self._construct_post_id()
 
     @property
+    def draft(self):
+        return self._config.get("Draft", False)
+
+    @property
     def date(self):
         return self._date.to_date_string()
 

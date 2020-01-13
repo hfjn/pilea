@@ -25,6 +25,7 @@ class State(object):
 
     def gather_posts(self):
         posts = [Post(self, file) for file in self.posts_folder.glob("**/*.md")]
+        posts = [post for post in posts if not post.draft]
         posts.sort(key=lambda x: x.date, reverse=True)
         return posts
 

@@ -36,6 +36,7 @@ def new(folder):
 
 
 @pilea.command()
+@click.option("--watch", is_flag=True)
 @pass_state
 def build(state: State, watch: bool):
     """
