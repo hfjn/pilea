@@ -1,7 +1,6 @@
 import re
 import shutil
 from pathlib import Path
-from typing import List
 
 import click
 import jinja2
@@ -9,21 +8,21 @@ import markdown
 from feedgen.entry import FeedEntry
 from feedgen.feed import FeedGenerator
 
-from pilea.post import Post
+from pilea.resources.photo import Photo
+from pilea.resources.post import Post
 from pilea.state import State
 
 
 class BuildController:
     def __init__(self, state: State):
         self.state = state
-        self.template_loader = jinja2.FileSystemLoader(
-            searchpath=str(self.state.template_folder)
-        )
+        self.template_loader = jinja2.FileSystemLoader(searchpath=str(self.state.template_folder))
         self.template_env = jinja2.Environment(loader=self.template_loader)
 
     def build_all(self):
         self.process_posts()
         self.process_pages()
+        self.process_photos()
         self.build_index("index")
         self.build_index("archive")
         self.build_feed()
@@ -46,16 +45,20 @@ class BuildController:
     def build_feed(self):
         feed_gen = self._configure_feed_generator()
         for post in self.state.posts:
+            post_url = self.state.generate_url(post)
             entry = FeedEntry()
             entry.title(post.title)
             entry.description(post.stub)
             entry.content(post.content)
-            entry.guid(post.url)
-            entry.link(href=post.url, rel="self")
+            entry.guid(post_url)
+            entry.link(href=post_url, rel="self")
             feed_gen.add_entry(entry)
         feed_gen.atom_file(str(self.state.atom_path))
         feed_gen.rss_file(str(self.state.rss_path))
 
+    def process_photos(self):
+        for photo in self.state.photos:
+            self.process_photo(photo)
 
     def process_posts(self):
         for post in self.state.posts:
@@ -64,6 +67,11 @@ class BuildController:
     def process_pages(self):
         for page in self.state.pages:
             self.process_markdown(page)
+
+    def process_photo(self, photo: Photo):
+        click.echo(f"Compiling {photo.file}")
+        photo.scale()
+        photo.save(path=self.state.output_folder)
 
     def process_markdown(self, post: Post):
         click.echo(f"Compiling {post.title}")
@@ -128,9 +136,7 @@ class BuildController:
             css = re.sub(r":\s*0(\.\d+([cm]m|e[mx]|in|p[ctx]))\s*;", r":\1;", css)
             for rule in re.findall(r"([^{]+){([^}]*)}", css):
                 selectors = [
-                    re.sub(
-                        r"(?<=[\[\(>+=])\s+|\s+(?=[=~^$*|>+\]\)])", r"", selector.strip()
-                    )
+                    re.sub(r"(?<=[\[\(>+=])\s+|\s+(?=[=~^$*|>+\]\)])", r"", selector.strip())
                     for selector in rule[0].split(",")
                 ]
                 properties = {}

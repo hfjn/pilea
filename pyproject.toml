@@ -43,6 +43,7 @@ pyyaml = "*"
 pygments = "*"
 pymdown-extensions = "*"
 livereload = "^2.6.1"
+Pillow = "^7.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
