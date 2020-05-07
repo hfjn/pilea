@@ -12,6 +12,8 @@ from pilea.resources.photo import Photo
 from pilea.resources.post import Post
 from pilea.state import State
 
+indices = ["index", "archive", "photo_journal"]
+
 
 class BuildController:
     def __init__(self, state: State):
@@ -23,8 +25,8 @@ class BuildController:
         self.process_posts()
         self.process_pages()
         self.process_photos()
-        self.build_index("index")
-        self.build_index("archive")
+        for index in indices:
+            self.build_index(index)
         self.build_feed()
         self.copy_static()
         self.minify_css()
@@ -70,16 +72,20 @@ class BuildController:
 
     def process_photo(self, photo: Photo):
         click.echo(f"Compiling {photo.file}")
-        photo.scale()
-        photo.save(path=self.state.output_folder)
+        photo_folder = self.state.output_folder / "photos"
+        if not photo_folder.exists():
+            photo_folder.mkdir(parents=True)
+        photo.save(path=photo_folder)
 
     def process_markdown(self, post: Post):
         click.echo(f"Compiling {post.title}")
         post.content = markdown.markdown(
-            post.content, output_format="html5", extensions=["codehilite", "fenced_code", "pymdownx.tilde"]
+            post.content,
+            output_format="html5",
+            extensions=["sane_lists", "codehilite", "fenced_code", "pymdownx.tilde"],
         )
         post.stub = markdown.markdown(
-            post.stub, output_format="html5", extensions=["codehilite", "fenced_code", "pymdownx.tilde"]
+            post.stub, output_format="html5", extensions=["sane_lists", "codehilite", "fenced_code", "pymdownx.tilde"]
         )
         doc = self._render_template(post.template, post=post, state=self.state)
         output_file: Path = self.state.build_output_file_name(post)

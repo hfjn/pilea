@@ -37,7 +37,7 @@ class Post(Resource):
 
     @property
     def draft(self):
-        return self._config.get("draft", False)
+        return self._config.get("Draft", False)
 
     def _construct_post_id(self):
         return f"{self.date}_{self.title.lower().replace(' ', '_')}"

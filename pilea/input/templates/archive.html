@@ -9,7 +9,7 @@
 
             {% for post in state.posts %}
             <li class="post-list-item">
-                <a class="post-list-item-title" href="{{post.url}}">
+                <a class="post-list-item-title" href="{{ state.generate_url(post) }}">
                     {{post.title}}
                 </a>
                 <time class="post-date f-sm f-mono" datetime="2019-06-12T13:51:47-05:00">

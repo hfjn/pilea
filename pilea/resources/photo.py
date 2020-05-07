@@ -22,29 +22,32 @@ class Photo(Resource):
             TAGS.get(exif_key): exif_value for exif_key, exif_value in self._image._getexif().items()
         }
 
-        self._date: DateTime = pendulum.parse(self._exif.get("DateTime", "1970-1-1"))
+        self._date: DateTime = pendulum.parse(self._exif.get("DateTimeOriginal", None))
+        if not self._date:
+            self._date = pendulum.parse(self._exif.get("DateTime", "1970-1-1"))
 
         self._height = self._image.height
         self._width = self._image.width
 
     @property
     def extension(self):
-        return "jpeg"
+        return "jpg"
 
     @property
     def id(self):
         return self._date.to_iso8601_string()
 
-    def scale(self) -> None:
-        self._image = Image.open(self.file)
-        if self._height <= MAX_HEIGHT and self._width <= MAX_WIDTH:
-            return None
-        elif self._height >= self._width:
-            width = int(MAX_HEIGHT / self._height * self._width)
-            self._image = self._image.resize((width, MAX_HEIGHT))
-        else:
-            height = int(MAX_WIDTH / self._width * self._height)
-            self._image = self._image.resize((height, MAX_HEIGHT), Image.ANTIALIAS)
-
     def save(self, path: Path):
+        # TODO: Set Copyright in exif
+        self._image: Image.Image = Image.open(self.file)
+
+        if self._exif.get("Orientation") == 3:
+            self._image = self._image.rotate(180, expand=True)
+        elif self._exif.get("Orientation") == 6:
+            self._image = self._image.rotate(270, expand=True)
+        elif self._exif.get("Orientation") == 9:
+            self._image = self._image.rotate(90, expand=True)
+
+        self._image.thumbnail((MAX_WIDTH, MAX_HEIGHT))
+
         self._image.save(path / self.target_name)
